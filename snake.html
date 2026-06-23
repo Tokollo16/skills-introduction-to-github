@@ -45,18 +45,20 @@
   <body>
     <main class="container">
       <h1>Simple Snake Game</h1>
-      <canvas id="board" width="400" height="400" aria-label="Snake board">Snake game board. Use arrow keys to move and collect food.</canvas>
+      <canvas id="board" width="400" height="400" role="img" aria-describedby="game-instructions game-status">Snake game board. Use arrow keys to move and collect food.</canvas>
       <div class="row">
         <p id="score">Score: 0</p>
         <button id="restart" type="button">Restart</button>
       </div>
-      <p>Use arrow keys to move.</p>
+      <p id="game-instructions">Use arrow keys to move.</p>
+      <p id="game-status" role="status" aria-live="polite">Game ready.</p>
     </main>
     <script>
       const board = document.getElementById("board");
       const ctx = board.getContext("2d");
       const scoreText = document.getElementById("score");
       const restartButton = document.getElementById("restart");
+      const statusText = document.getElementById("game-status");
 
       const cellSize = 20;
       const cells = board.width / cellSize;
@@ -68,6 +70,11 @@
       let score;
       let gameOver;
       let timer;
+
+      function setStatus(message) {
+        statusText.textContent = message;
+        board.setAttribute("aria-label", `Snake board. ${message} Score ${score}.`);
+      }
 
       function randomCell() {
         return {
@@ -93,6 +100,7 @@
         score = 0;
         gameOver = false;
         scoreText.textContent = "Score: 0";
+        setStatus("Game in progress.");
         spawnFood();
         clearInterval(timer);
         timer = setInterval(update, speedMs);
@@ -116,6 +124,7 @@
         if (hitWall(head) || hitBody(head)) {
           gameOver = true;
           clearInterval(timer);
+          setStatus("Game over.");
           draw();
           return;
         }
@@ -125,6 +134,7 @@
         if (head.x === food.x && head.y === food.y) {
           score += 1;
           scoreText.textContent = `Score: ${score}`;
+          setStatus("Food collected.");
           spawnFood();
         } else {
           snake.pop();
@@ -162,6 +172,7 @@
         };
         const move = moves[event.key];
         if (!move) return;
+        event.preventDefault();
 
         if (direction.x + move.x === 0 && direction.y + move.y === 0) return;
         nextDirection = move;
