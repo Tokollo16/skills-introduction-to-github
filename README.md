@@ -19,6 +19,14 @@ In this exercise, you will:
 3. Open a pull request
 4. Merge your pull request
 
+## Simple snake game
+
+This repository now includes a small browser game at `/snake.html`.
+
+- Open `/home/runner/work/skills-introduction-to-github/skills-introduction-to-github/snake.html` in a web browser.
+- Use the arrow keys to move the snake.
+- Click **Restart** to start a new round.
+
 ### How to start this exercise
 
 Simply copy the exercise to your account, then give your favorite Octocat (Mona) **about 20 seconds** to prepare the first lesson, then **refresh the page**.

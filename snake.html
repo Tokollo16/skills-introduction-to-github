@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Snake Game</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      .container {
+        text-align: center;
+      }
+      canvas {
+        border: 2px solid #38bdf8;
+        background: #020617;
+      }
+      .row {
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+      button {
+        background: #38bdf8;
+        color: #020617;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 10px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Simple Snake Game</h1>
+      <canvas id="board" width="400" height="400" aria-label="Snake board"></canvas>
+      <div class="row">
+        <p id="score">Score: 0</p>
+        <button id="restart" type="button">Restart</button>
+      </div>
+      <p>Use arrow keys to move.</p>
+    </main>
+    <script>
+      const board = document.getElementById("board");
+      const ctx = board.getContext("2d");
+      const scoreText = document.getElementById("score");
+      const restartButton = document.getElementById("restart");
+
+      const cellSize = 20;
+      const cells = board.width / cellSize;
+      const speedMs = 120;
+      let snake;
+      let direction;
+      let nextDirection;
+      let food;
+      let score;
+      let gameOver;
+      let timer;
+
+      function randomCell() {
+        return {
+          x: Math.floor(Math.random() * cells),
+          y: Math.floor(Math.random() * cells),
+        };
+      }
+
+      function spawnFood() {
+        do {
+          food = randomCell();
+        } while (snake.some((part) => part.x === food.x && part.y === food.y));
+      }
+
+      function resetGame() {
+        snake = [
+          { x: 10, y: 10 },
+          { x: 9, y: 10 },
+          { x: 8, y: 10 },
+        ];
+        direction = { x: 1, y: 0 };
+        nextDirection = { ...direction };
+        score = 0;
+        gameOver = false;
+        scoreText.textContent = "Score: 0";
+        spawnFood();
+        clearInterval(timer);
+        timer = setInterval(update, speedMs);
+        draw();
+      }
+
+      function hitWall(head) {
+        return head.x < 0 || head.x >= cells || head.y < 0 || head.y >= cells;
+      }
+
+      function hitBody(head) {
+        return snake.some((part, index) => index > 0 && part.x === head.x && part.y === head.y);
+      }
+
+      function update() {
+        if (gameOver) return;
+
+        direction = nextDirection;
+        const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+        if (hitWall(head) || hitBody(head)) {
+          gameOver = true;
+          clearInterval(timer);
+          draw();
+          return;
+        }
+
+        snake.unshift(head);
+
+        if (head.x === food.x && head.y === food.y) {
+          score += 1;
+          scoreText.textContent = `Score: ${score}`;
+          spawnFood();
+        } else {
+          snake.pop();
+        }
+
+        draw();
+      }
+
+      function drawCell(cell, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(cell.x * cellSize, cell.y * cellSize, cellSize - 1, cellSize - 1);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, board.width, board.height);
+        drawCell(food, "#f43f5e");
+        snake.forEach((part, index) => drawCell(part, index === 0 ? "#22c55e" : "#4ade80"));
+
+        if (gameOver) {
+          ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+          ctx.fillRect(0, 0, board.width, board.height);
+          ctx.fillStyle = "#e2e8f0";
+          ctx.font = "24px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("Game Over", board.width / 2, board.height / 2);
+        }
+      }
+
+      document.addEventListener("keydown", (event) => {
+        const moves = {
+          ArrowUp: { x: 0, y: -1 },
+          ArrowDown: { x: 0, y: 1 },
+          ArrowLeft: { x: -1, y: 0 },
+          ArrowRight: { x: 1, y: 0 },
+        };
+        const move = moves[event.key];
+        if (!move) return;
+
+        if (direction.x + move.x === 0 && direction.y + move.y === 0) return;
+        nextDirection = move;
+      });
+
+      restartButton.addEventListener("click", resetGame);
+      resetGame();
+    </script>
+  </body>
+</html>
