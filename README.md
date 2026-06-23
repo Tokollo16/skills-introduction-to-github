@@ -21,9 +21,9 @@ In this exercise, you will:
 
 ## Simple snake game
 
-This repository now includes a small browser game at `/snake.html`.
+This repository now includes a small browser game at `snake.html`.
 
-- Open `/home/runner/work/skills-introduction-to-github/skills-introduction-to-github/snake.html` in a web browser.
+- Open `snake.html` from the repository root in a web browser.
 - Use the arrow keys to move the snake.
 - Click **Restart** to start a new round.
 
